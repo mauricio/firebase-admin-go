@@ -151,6 +151,12 @@ func (c *Client) CustomToken(ctx context.Context, uid string) (string, error) {
 // CustomTokenWithClaims is similar to CustomToken, but in addition to the user ID, it also encodes
 // all the key-value pairs in the provided map as claims in the resulting JWT.
 func (c *Client) CustomTokenWithClaims(ctx context.Context, uid string, devClaims map[string]interface{}) (string, error) {
+	return c.CustomTokenWithClaimsAndTenant(ctx, uid, "", devClaims)
+}
+
+// CustomTokenWithClaimsAndTenant is similar to CustomToken, but in addition to the user ID, it also encodes
+// all the key-value pairs in the provided map as claims in the resulting JWT and the tenant id.
+func (c *Client) CustomTokenWithClaimsAndTenant(ctx context.Context, uid, tenantID string, devClaims map[string]interface{}) (string, error) {
 	iss, err := c.signer.Email(ctx)
 	if err != nil {
 		return "", err
@@ -176,13 +182,14 @@ func (c *Client) CustomTokenWithClaims(ctx context.Context, uid string, devClaim
 	info := &jwtInfo{
 		header: jwtHeader{Algorithm: "RS256", Type: "JWT"},
 		payload: &customToken{
-			Iss:    iss,
-			Sub:    iss,
-			Aud:    firebaseAudience,
-			UID:    uid,
-			Iat:    now,
-			Exp:    now + oneHourInSeconds,
-			Claims: devClaims,
+			Iss:      iss,
+			Sub:      iss,
+			Aud:      firebaseAudience,
+			UID:      uid,
+			Iat:      now,
+			Exp:      now + oneHourInSeconds,
+			TenantID: tenantID,
+			Claims:   devClaims,
 		},
 	}
 	return info.Token(ctx, c.signer)

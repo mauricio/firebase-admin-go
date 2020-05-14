@@ -47,6 +47,7 @@ type customToken struct {
 	Iat    int64                  `json:"iat"`
 	Sub    string                 `json:"sub,omitempty"`
 	UID    string                 `json:"uid,omitempty"`
+	TenantID string               `json:"tenant_id,omitempty"`
 	Claims map[string]interface{} `json:"claims,omitempty"`
 }
 
